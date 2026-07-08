@@ -4,17 +4,21 @@
 #include "buffer.h"
 #include "constants.h"
 
-#include <array>
 #include <cstddef>
 
 class Synth {
-
   protected:
     Buffer _buffer;
+    double _frequency;
+    double _amplitude;
+    double _phase;
 
   public:
+    Synth(float frequency, float amplitude) : _frequency(frequency), _amplitude(amplitude), _phase(0) {
+    }
+    virtual ~Synth() = default;
+
     virtual void fill_buffer() = 0;
-    virtual ~Synth()           = default;
 
     void add_to_buffer(Buffer& target) {
         auto& left_buffer  = _buffer.left();
@@ -22,15 +26,11 @@ class Synth {
         auto& left_target  = target.left();
         auto& right_target = target.right();
 
-        for (size_t i = 0; i != _buffer.samples(); ++i) {
+        for (size_t i = 0; i != Buffer::BUFFER_SIZE; ++i) {
             left_target[i] += left_buffer[i];
             right_target[i] += right_buffer[i];
         }
     }
-
-    // const std::array<float, BUFFER_SIZE> buffer() const {
-    //     return _buffer;
-    // }
 };
 
 #endif // __SYNTH__H_

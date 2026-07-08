@@ -14,6 +14,6 @@ class Pcm {
   public:
     Pcm();
     ~Pcm();
-    void write(Buffer& buffer);
+    void write_buffer(Buffer& buffer);
 };
 #endif // __PCM__H_

@@ -1,5 +1,4 @@
 #include "src/buffer.h"
-#include "src/constants.h"
 #include "src/pcm.h"
 #include "src/saw.h"
 #include "src/sine.h"
@@ -7,9 +6,6 @@
 
 #include <algorithm>
 #include <alsa/asoundlib.h>
-#include <array>
-#include <cassert>
-#include <cmath>
 #include <memory>
 #include <vector>
 
@@ -21,7 +17,7 @@ int main() {
     std::vector<std::unique_ptr<Synth>> saws;
 
     for (size_t i = 0; i != 5; ++i) {
-        saws.emplace_back(new Saw(0.1 * 440.0 + (static_cast<float>(i) / 6.4), 0.1));
+        saws.emplace_back(new Saw(440.0 + (static_cast<float>(i) / 8.4), 0.1));
     }
 
     while (true) {
@@ -32,6 +28,6 @@ int main() {
             synth->add_to_buffer(buffer);
         });
 
-        pcm.write(buffer);
+        pcm.write_buffer(buffer);
     }
 }

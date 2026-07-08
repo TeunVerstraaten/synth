@@ -9,7 +9,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(ALSA REQUIRED alsa)
 
 add_executable(synth
-    main.cpp src/pcm.cpp
+    main.cpp src/pcm.cpp src/buffer.cpp
 )
 
 target_include_directories(synth PRIVATE

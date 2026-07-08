@@ -7,26 +7,23 @@
 #include <cmath>
 
 class Sine : public Synth {
-    double _amplitude;
-    double _phase;
-    double _d_phase;
 
   public:
-    Sine(float frequency, double amplitude) : _amplitude(amplitude), _phase(0), _d_phase(2.0 * M_PI * frequency / SAMPLE_RATE) {
+    Sine(float frequency, float amplitude) : Synth(frequency, amplitude) {
     }
 
     void fill_buffer() final {
         auto& left_buffer  = _buffer.left();
         auto& right_buffer = _buffer.right();
 
-        for (unsigned i = 0; i < _buffer.samples(); ++i) {
-            left_buffer[i]  = _amplitude * std::sin(_phase);
-            right_buffer[i] = _amplitude * std::sin(_phase);
+        for (unsigned i = 0; i < Buffer::BUFFER_SIZE; ++i) {
+            left_buffer[i]  = _amplitude * std::sin(M_PI * _phase);
+            right_buffer[i] = _amplitude * std::sin(M_PI * _phase);
 
-            _phase += _d_phase;
+            _phase += 2.0 * _frequency / SAMPLE_RATE;
 
-            if (_phase >= 2.0 * M_PI) {
-                _phase -= 2.0 * M_PI;
+            if (_phase >= 1) {
+                _phase -= 2;
             }
         }
     }
