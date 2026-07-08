@@ -16,8 +16,12 @@ class Sine : public Synth {
     }
 
     void fill_buffer() final {
-        for (unsigned i = 0; i < _buffer.size(); ++i) {
-            _buffer[i] = _amplitude * std::sin(_phase);
+        auto& left_buffer  = _buffer.left();
+        auto& right_buffer = _buffer.right();
+
+        for (unsigned i = 0; i < _buffer.samples(); ++i) {
+            left_buffer[i]  = _amplitude * std::sin(_phase);
+            right_buffer[i] = _amplitude * std::sin(_phase);
 
             _phase += _d_phase;
 

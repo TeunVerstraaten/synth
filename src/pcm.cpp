@@ -1,16 +1,13 @@
 #include "pcm.h"
 
+#include "constants.h"
+
+#include <iostream>
+
 Pcm::Pcm() {
     int err = snd_pcm_open(&pcm, "default", SND_PCM_STREAM_PLAYBACK, 0);
     assert(err >= 0);
-    err = snd_pcm_set_params(pcm,
-                             SND_PCM_FORMAT_FLOAT_LE, // 32-bit float samples
-                             SND_PCM_ACCESS_RW_INTERLEAVED,
-                             1, // mono
-                             SAMPLE_RATE,
-                             1,     // allow resampling
-                             500000 // 0.5 sec latency
-    );
+    err = snd_pcm_set_params(pcm, SND_PCM_FORMAT_FLOAT_LE, SND_PCM_ACCESS_RW_NONINTERLEAVED, 2, SAMPLE_RATE, 1, 500000);
     assert(err >= 0);
 }
 
@@ -18,8 +15,11 @@ Pcm::~Pcm() {
     snd_pcm_close(pcm);
 }
 
-void Pcm::write(float* buffer, size_t buffer_size) {
-    snd_pcm_sframes_t frames = snd_pcm_writei(pcm, buffer, BUFFER_SIZE);
+void Pcm::write(Buffer& buffer) {
+
+    void* buffer_ptrs[] = {buffer.left().data(), buffer.right().data()};
+
+    snd_pcm_sframes_t frames = snd_pcm_writen(pcm, buffer_ptrs, BUFFER_SIZE);
 
     if (frames < 0) {
         frames = snd_pcm_recover(pcm, frames, 0);

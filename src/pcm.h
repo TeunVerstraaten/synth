@@ -1,9 +1,11 @@
 #ifndef __PCM__H_
 #define __PCM__H_
 
+#include "buffer.h"
 #include "constants.h"
 
 #include <alsa/asoundlib.h>
+#include <array>
 #include <cassert>
 
 class Pcm {
@@ -12,6 +14,6 @@ class Pcm {
   public:
     Pcm();
     ~Pcm();
-    void write(float* buffer, size_t buffer_size);
+    void write(Buffer& buffer);
 };
 #endif // __PCM__H_

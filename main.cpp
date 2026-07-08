@@ -1,7 +1,9 @@
+#include "src/buffer.h"
 #include "src/constants.h"
 #include "src/pcm.h"
 #include "src/saw.h"
 #include "src/sine.h"
+#include "src/synth.h"
 
 #include <algorithm>
 #include <alsa/asoundlib.h>
@@ -14,7 +16,7 @@
 int main() {
     Pcm pcm;
 
-    std::array<float, BUFFER_SIZE> buffer;
+    Buffer buffer;
 
     std::vector<std::unique_ptr<Synth>> saws;
 
@@ -23,16 +25,13 @@ int main() {
     }
 
     while (true) {
-        std::ranges::for_each(buffer, [](auto& s) { s = 0; });
+        buffer.set_zero();
 
-        std::ranges::for_each(saws, [&buffer](auto& saw) {
-            saw->fill_buffer();
-            const auto& synth_buffer = saw->buffer();
-            for (size_t i = 0; i != BUFFER_SIZE; ++i) {
-                buffer[i] += synth_buffer[i];
-            }
+        std::ranges::for_each(saws, [&buffer](auto& synth) {
+            synth->fill_buffer();
+            synth->add_to_buffer(buffer);
         });
 
-        pcm.write(buffer.data(), BUFFER_SIZE);
+        pcm.write(buffer);
     }
 }
