@@ -3,19 +3,36 @@
 #include "src/saw.h"
 #include "src/sine.h"
 
+#include <algorithm>
 #include <alsa/asoundlib.h>
+#include <array>
 #include <cassert>
 #include <cmath>
+#include <memory>
+#include <vector>
 
 int main() {
     Pcm pcm;
 
-    float buffer[BUFFER_SIZE];
-    Saw   sine{440.0, 1.0};
+    std::array<float, BUFFER_SIZE> buffer;
+
+    std::vector<std::unique_ptr<Synth>> saws;
+
+    for (size_t i = 0; i != 5; ++i) {
+        saws.emplace_back(new Saw(0.1 * 440.0 + (static_cast<float>(i) / 6.4), 0.1));
+    }
 
     while (true) {
-        sine.fill_buffer(buffer, BUFFER_SIZE);
+        std::ranges::for_each(buffer, [](auto& s) { s = 0; });
 
-        pcm.write(buffer, BUFFER_SIZE);
+        std::ranges::for_each(saws, [&buffer](auto& saw) {
+            saw->fill_buffer();
+            const auto& synth_buffer = saw->buffer();
+            for (size_t i = 0; i != BUFFER_SIZE; ++i) {
+                buffer[i] += synth_buffer[i];
+            }
+        });
+
+        pcm.write(buffer.data(), BUFFER_SIZE);
     }
 }

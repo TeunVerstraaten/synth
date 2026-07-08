@@ -7,24 +7,22 @@
 #include <cmath>
 
 class Saw : public Synth {
-    double _frequency;
     double _amplitude;
     double _phase;
-    double _phaseIncrement;
+    double _d_phase;
 
   public:
-    Saw(float frequency, double amplitude)
-        : _frequency(frequency), _amplitude(amplitude), _phase(0), _phaseIncrement(2.0 * M_PI * frequency / SAMPLE_RATE) {
+    Saw(float frequency, double amplitude) : _amplitude(amplitude), _phase(0), _d_phase(2.0 * frequency / SAMPLE_RATE) {
     }
 
-    void fill_buffer(float* buffer, size_t buffer_size) final {
-        for (unsigned i = 0; i < buffer_size; ++i) {
-            buffer[i] = _amplitude * _phase / 2.0 / M_PI;
+    void fill_buffer() final {
+        for (unsigned i = 0; i < _buffer.size(); ++i) {
+            _buffer[i] = _amplitude * _phase;
 
-            _phase += _phaseIncrement;
+            _phase += _d_phase;
 
-            if (_phase >= 2.0 * M_PI) {
-                _phase -= 2.0 * M_PI;
+            if (_phase >= 1) {
+                _phase -= 2;
             }
         }
     }

@@ -25,5 +25,8 @@ target_link_libraries(synth PRIVATE
 )
 
 target_compile_options(synth PRIVATE
+   -O3
+    -Wall
+    -pedantic
     ${ALSA_CFLAGS_OTHER}
 )
