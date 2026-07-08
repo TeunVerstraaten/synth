@@ -1,5 +1,7 @@
 #include "src/constants.h"
 #include "src/pcm.h"
+#include "src/saw.h"
+#include "src/sine.h"
 
 #include <alsa/asoundlib.h>
 #include <cassert>
@@ -9,20 +11,10 @@ int main() {
     Pcm pcm;
 
     float buffer[BUFFER_SIZE];
-
-    double phase          = 0.0;
-    double phaseIncrement = 2.0 * M_PI * FREQUENCY / SAMPLE_RATE;
+    Saw   sine{440.0, 1.0};
 
     while (true) {
-
-        for (unsigned i = 0; i < BUFFER_SIZE; ++i) {
-            buffer[i] = AMPLITUDE * std::sin(phase);
-
-            phase += phaseIncrement;
-
-            if (phase >= 2.0 * M_PI)
-                phase -= 2.0 * M_PI;
-        }
+        sine.fill_buffer(buffer, BUFFER_SIZE);
 
         pcm.write(buffer, BUFFER_SIZE);
     }
